@@ -8,10 +8,27 @@
 ***
 __**Check out documentation**__: [https://deknowny.github.io/polinfapi/latest/](https://deknowny.github.io/polinfapi/latest/)
 
-# Features
-In developing now. Will be later
 ## Overview
-Later
+```python
+import polinfapi
+
+
+# Получение всех тренировочных заданий под номером 1
+tasks = polinfapi.Task1ModelsAnalysis.fetch()
+# Первый из списка
+task = tasks[0]
+
+print(
+    f"Номер задания: {task.raw.no}\n"
+    f"Вопрос: {task.question}\n"
+    f"Ответ: {task.answer}"
+)
+
+# Сохранение картинки задания на диск
+with open("file.jpg", "wb+") as fd:
+    image = tasks[0].download_image()
+    fd.write(image.getvalue())
+```
 
 # Installation
 Via PyPI:
