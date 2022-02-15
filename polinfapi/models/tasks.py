@@ -43,3 +43,6 @@ class Task1ModelsAnalysis(BaseTask, ContainsImageMixin):
             "gif_name"
         )
         return POLYAKOV_BASE_GIF_URL + gif_name
+
+
+
