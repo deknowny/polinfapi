@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import abc
 import dataclasses
 import io
@@ -5,7 +7,7 @@ import typing
 
 from polinfapi.client import BaseSyncClient, RequestsClient
 from polinfapi.parser import RawTask, parse_to_raw_tasks
-from polinfapi.utils import download_image
+from polinfapi.utils import download_image, POLYAKOV_BASE_URL, POLYAKOV_BASE_GIF_URL
 
 TaskType = typing.TypeVar("TaskType")
 
@@ -17,23 +19,22 @@ class RawCode(typing.NamedTuple):
 
 @dataclasses.dataclass
 class TaskModel:
-    raw_task: RawTask
+    raw: RawTask
     question: str
     answer: str
     gif_url: typing.Optional[str] = None
-    raw_codes: typing.List[RawCode] = dataclasses.dataclass(default_factory=list)
+    raw_codes: typing.List[RawCode] = dataclasses.field(default_factory=list)
     input_data: typing.Optional[str] = None
     output_data: typing.Optional[str] = None
 
     @classmethod
     def fetch(cls, no: int, client: typing.Optional[BaseSyncClient] = None) -> typing.List[TaskModel]:
         with RequestsClient.exists_or_new(client) as session:
-            tasks_content = session.get(cls.task_url)
+            tasks_content = session.get(POLYAKOV_BASE_URL + task_urls[no])
             return [
-                task_initors[no](raw_task)
+                task_init[no](raw_task)
                 for raw_task in parse_to_raw_tasks(tasks_content)
             ]
-
 
     def download_gif(self) -> io.BytesIO:
         pass
@@ -42,8 +43,8 @@ class TaskModel:
         pass
 
 
-
 def init_1_task(raw_task: RawTask) -> TaskModel:
+    task1_image_regex = re.compile(r'<br/><img src="(?P<gif_name>\d+\.gif)"/?>')
     gif_name = task1_image_regex.search(raw_task.raw_text).group(
         "gif_name"
     )
@@ -61,8 +62,11 @@ def init_1_task(raw_task: RawTask) -> TaskModel:
     )
 
 
-task_initors = {
+task_init = {
     1: init_1_task
+}
+task_urls = {
+    1: "/school/ege/gen.php?action=viewAllEgeNo&egeId=1&cat12=on&cat13=on"
 }
 
 
